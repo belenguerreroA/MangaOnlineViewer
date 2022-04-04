@@ -34,7 +34,7 @@
 // @include /https?:\/\/(www.)?leitor.net\/manga\/.+\/.+\/.+/
 // @include /https?:\/\/(www.)?lhtranslation.net\/read.+/
 // @include /https?:\/\/.+\/(manga|series)\/.+\/.+/
-// @include /https?:\/\/(www.)?mangadex.org\/chapter\/.+(\/.+)?/
+// 
 // @include /https?:\/\/(www.)?mngdoom.com\/.+\/[0-9]+/
 // @include /https?:\/\/.{3,4}?(mangafreak).net\/Read.+/
 // @include /https?:\/\/(www.)?fanfox.net\/manga\/.+\/.+\//
@@ -60,6 +60,7 @@
 // @exclude /https?:\/\/(www.)?pururin.io\/.+/
 // ==/UserScript==
 
+// @include /https?:\/\/(www.)?mangadex.org\/chapter\/.+(\/.+)?/
 (function() {
   'use strict';
 
