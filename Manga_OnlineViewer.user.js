@@ -55,6 +55,7 @@
 // @include /https?:\/\/(www.)?(tmofans|lectortmo|followmanga).com\/.+\/.+\/(paginated|cascade)/
 // @include /https?:\/\/(www.)?unionleitor.top\/leitor\/.+\/.+/
 // @include /https?:\/\/(www.)?bato.to\/chapter.*/
+// @include /https?:\/\/(www.)?mangatoto.com\/chapter\/.+/
 // @exclude /https?:\/\/(www.)?tsumino.com\/.+/
 // @exclude /https?:\/\/(www.)?pururin.io\/.+/
 // ==/UserScript==
@@ -79,6 +80,30 @@
         prev: $('.nav-prev a').attr('href'),
         next: $('.nav-next a').attr('href'),
         listImages: $('.page-img').get().map(i => $(i).attr('src'))
+      };
+    }
+  };
+
+  var mangatoto = {
+    name: 'Mangatoto',
+    url: /https?:\/\/(www.)?mangatoto.com\/chapter\/.+/,
+    homepage: 'http://mangatoto.com/',
+    language: ['English'],
+    category: 'manga',
+    run() {
+      const num = $('#viewer .item').length;
+      var SitePath = '';
+      var Capi = '';
+      var FileNombre = '';
+      SitePath = window.location.pathname.split('/');
+      Capi = SitePath.slice(-1)[0];
+      return {
+        title: ($('.nav-title a').text() + ' - ' + $('.nav-epis select option[value="'+Capi+'"]').text()).replace(/\n/g, ""),
+        series: $('.nav-title a').attr('href'),
+        quant: num,
+        prev: $('.nav-prev a').attr('href'),
+        next: $('.nav-next a').attr('href'),
+        listImages: $('.page-img').get().map(i => $(i).attr('src')),
       };
     }
   };
@@ -129,9 +154,16 @@
     language: ['English'],
     category: 'manga',
     run() {
+      var dy_series = '';
+        if($('#chapter-title b a').attr('href') == undefined) {
+            dy_series = $('#chapter-title > a').attr('href');
+        } else {
+            dy_series = $('#chapter-title b a').attr('href');
+        }
       return {
         title: $('#chapter-title').text(),
-        series: '#',
+        //series: '#',
+        series: dy_series,
         quant: W.pages.length,
         prev: $('#prev_link').attr('href'),
         next: $('#next_link').attr('href'),
@@ -825,7 +857,7 @@
     mangahub, mangainn, mangakakalot, mangalyght, manganato, mangapark,
     mangasee, mangatown, ninemanga, rawdevart, readcomicsonline, readmangatoday, senmanga,
     tmofans, unionmangas,
-    batoto
+    batoto,mangatoto
   ];
 
   function logScript(...text) {
@@ -1025,7 +1057,8 @@
     } else {
       const blobLink = document.getElementById('blob');
       try {
-        blobLink.download = "".concat($('#series i').first().text().trim(), ".zip");
+        // blobLink.download = "".concat($('#series i').first().text().trim(), ".zip");
+        blobLink.download = "".concat($('#FileNombre').first().text().trim(), ".zip");
         cache.zip.generateAsync({
           type: 'blob'
         }).then(content => {
@@ -1692,7 +1725,8 @@
   const listPages = R.times(index => "<div id='Page".concat(index + 1, "' class='MangaPage'>\n  <div class='PageFunctions'>\n    <a class='Bookmark controlButton' title='Bookmark'></a>\n    <a class='ZoomIn controlButton' title='Zoom In'></a>\n    <a class='ZoomRestore controlButton' title='Zoom Restore'></a>\n    <a class='ZoomOut controlButton' title='Zoom Out'></a>\n    <a class='ZoomWidth controlButton' title='Zoom to Width'></a>\n    <a class='ZoomHeight controlButton' title='Zoom to Height'></a>\n    <a class='Hide controlButton' title='Hide'></a>\n    <a class='Reload controlButton' title='Reload'></a>\n    <span>").concat(index + 1, "</span>\n  </div>\n  <div class='PageContent'>\n    <img id='PageImg").concat(index + 1, "' alt='PageImg").concat(index + 1, "' />\n  </div>\n</div>"));
   const listOptions = R.times(index => "<option value='".concat(index + 1, "'>").concat(index + 1, "</option>"));
   const listThumbnails = R.times(index => "<div id='Thumbnail".concat(index + 1, "' class='Thumbnail'><img id='ThumbnailImg").concat(index + 1, "' alt='ThumbnailImg").concat(index + 1, "' src=''/><span>").concat(index + 1, "</span></div>"));
-  const body = (manga, begin = 0) => "\n<div id='MangaOnlineViewer' class='".concat(settings.Theme, " ").concat(isMobile ? 'mobile' : '', " ").concat(settings.hidePageControls ? 'hideControls' : '', "'>\n  ").concat(title(manga), "\n  <div id='Counters' class='controlLabel'>\n    <i>0</i> of <b>").concat(manga.quant, "</b> Pages Loaded\n    <span class='controlLabel'>Go to Page:</span>\n    <select id='gotoPage'>\n      <option selected>#</option>\n      ").concat(listOptions(manga.quant).slice(begin).join(''), "\n    </select>\n  </div>\n  ").concat(chapterControlTop(manga), "\n  <div id='Chapter' class='").concat(settings.FitWidthIfOversized === true ? 'fitWidthIfOversized' : '', " ").concat(settings.viewMode, "'>\n    ").concat(listPages(manga.quant).slice(begin).join(''), "\n  </div>\n  ").concat(title(manga), "\n  ").concat(chapterControlBottom(manga), "\n  ").concat(panel, "\n  ").concat(controls, "\n  ").concat(htmlKeybinds, "\n  <div id='Navigation' class='panel ").concat(settings.ShowThumbnails ? '' : 'disabled', "'>\n    <div id='NavigationCounters' class='controlLabel'>\n      <img alt='Thumbnails' title='Thumbnails' src='").concat(icon.menu, "' class='nav' /><i>0</i> of <b>").concat(manga.quant, "</b> Pages Loaded\n    </div>\n    <div id='Thumbnails'>\n      ").concat(listThumbnails(manga.quant).slice(begin).join(''), "\n    </div>\n  </div>\n  <a href='#' id='blob' style='display: none;'>Download</a>\n</div>");
+  const FileNombre = manga => "<input type='hidden' id='FileNombre' value='".concat(manga.title, "'>");
+  const body = (manga, begin = 0) => "\n<div id='MangaOnlineViewer' class='".concat(settings.Theme, " ").concat(isMobile ? 'mobile' : '', " ").concat(settings.hidePageControls ? 'hideControls' : '', "'>\n  ").concat(FileNombre(manga)).concat(title(manga), "\n  <div id='Counters' class='controlLabel'>\n    <i>0</i> of <b>").concat(manga.quant, "</b> Pages Loaded\n    <span class='controlLabel'>Go to Page:</span>\n    <select id='gotoPage'>\n      <option selected>#</option>\n      ").concat(listOptions(manga.quant).slice(begin).join(''), "\n    </select>\n  </div>\n  ").concat(chapterControlTop(manga), "\n  <div id='Chapter' class='").concat(settings.FitWidthIfOversized === true ? 'fitWidthIfOversized' : '', " ").concat(settings.viewMode, "'>\n    ").concat(listPages(manga.quant).slice(begin).join(''), "\n  </div>\n  ").concat(title(manga), "\n  ").concat(chapterControlBottom(manga), "\n  ").concat(panel, "\n  ").concat(controls, "\n  ").concat(htmlKeybinds, "\n  <div id='Navigation' class='panel ").concat(settings.ShowThumbnails ? '' : 'disabled', "'>\n    <div id='NavigationCounters' class='controlLabel'>\n      <img alt='Thumbnails' title='Thumbnails' src='").concat(icon.menu, "' class='nav' /><i>0</i> of <b>").concat(manga.quant, "</b> Pages Loaded\n    </div>\n    <div id='Thumbnails'>\n      ").concat(listThumbnails(manga.quant).slice(begin).join(''), "\n    </div>\n  </div>\n  <a href='#' id='blob' style='display: none;'>Download</a>\n</div>");
   const readerCSS = "<style type='text/css'>\n".concat(cssStyles, "\n#MangaOnlineViewer .PageFunctions .Bookmark {background: url('").concat(icon.bookmark, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .Reload {background: url('").concat(icon.reload, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .Hide {background: url('").concat(icon.hide, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .ZoomIn {background: url('").concat(icon.zoomIn, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .ZoomOut {background: url('").concat(icon.zoomOut, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .ZoomRestore {background: url('").concat(icon.zoomRestore, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .ZoomWidth {background: url('").concat(icon.zoomWidth, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .ZoomHeight {background: url('").concat(icon.zoomWidth, "') no-repeat scroll center center transparent;}\n</style>");
 
   function reader(manga, begin = 0) {
