@@ -1059,7 +1059,7 @@
       const blobLink = document.getElementById('blob');
       try {
         // blobLink.download = "".concat($('#series i').first().text().trim(), ".zip");
-        blobLink.download = "".concat($('#FileNombre').first().text().trim(), ".zip");
+        blobLink.download = "".concat($('#FileNombre').val().trim(), ".zip");
         cache.zip.generateAsync({
           type: 'blob'
         }).then(content => {
