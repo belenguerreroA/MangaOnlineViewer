@@ -34,7 +34,6 @@
 // @include /https?:\/\/(www.)?leitor.net\/manga\/.+\/.+\/.+/
 // @include /https?:\/\/(www.)?lhtranslation.net\/read.+/
 // @include /https?:\/\/.+\/(manga|series)\/.+\/.+/
-// 
 // @include /https?:\/\/(www.)?mngdoom.com\/.+\/[0-9]+/
 // @include /https?:\/\/.{3,4}?(mangafreak).net\/Read.+/
 // @include /https?:\/\/(www.)?fanfox.net\/manga\/.+\/.+\//
@@ -58,9 +57,10 @@
 // @include /https?:\/\/(www.)?mangatoto.com\/chapter\/.+/
 // @exclude /https?:\/\/(www.)?tsumino.com\/.+/
 // @exclude /https?:\/\/(www.)?pururin.io\/.+/
+// @exclude /http?:\/\/localhost?:([0-9]*)?\/lector\/.+/
+// @exclude /https?:\/\/(www.)?mangadex.org\/chapter\/.+(\/.+)?/
 // ==/UserScript==
 
-// @include /https?:\/\/(www.)?mangadex.org\/chapter\/.+(\/.+)?/
 (function() {
   'use strict';
 
@@ -1726,7 +1726,7 @@
   const listPages = R.times(index => "<div id='Page".concat(index + 1, "' class='MangaPage'>\n  <div class='PageFunctions'>\n    <a class='Bookmark controlButton' title='Bookmark'></a>\n    <a class='ZoomIn controlButton' title='Zoom In'></a>\n    <a class='ZoomRestore controlButton' title='Zoom Restore'></a>\n    <a class='ZoomOut controlButton' title='Zoom Out'></a>\n    <a class='ZoomWidth controlButton' title='Zoom to Width'></a>\n    <a class='ZoomHeight controlButton' title='Zoom to Height'></a>\n    <a class='Hide controlButton' title='Hide'></a>\n    <a class='Reload controlButton' title='Reload'></a>\n    <span>").concat(index + 1, "</span>\n  </div>\n  <div class='PageContent'>\n    <img id='PageImg").concat(index + 1, "' alt='PageImg").concat(index + 1, "' />\n  </div>\n</div>"));
   const listOptions = R.times(index => "<option value='".concat(index + 1, "'>").concat(index + 1, "</option>"));
   const listThumbnails = R.times(index => "<div id='Thumbnail".concat(index + 1, "' class='Thumbnail'><img id='ThumbnailImg").concat(index + 1, "' alt='ThumbnailImg").concat(index + 1, "' src=''/><span>").concat(index + 1, "</span></div>"));
-  const FileNombre = manga => "<input type='hidden' id='FileNombre' value='".concat(manga.title, "'>");
+  const FileNombre = manga => "<input type='hidden' id='FileNombre' value='".concat((manga.title).replace(/'/g, ''), "'>");
   const body = (manga, begin = 0) => "\n<div id='MangaOnlineViewer' class='".concat(settings.Theme, " ").concat(isMobile ? 'mobile' : '', " ").concat(settings.hidePageControls ? 'hideControls' : '', "'>\n  ").concat(FileNombre(manga)).concat(title(manga), "\n  <div id='Counters' class='controlLabel'>\n    <i>0</i> of <b>").concat(manga.quant, "</b> Pages Loaded\n    <span class='controlLabel'>Go to Page:</span>\n    <select id='gotoPage'>\n      <option selected>#</option>\n      ").concat(listOptions(manga.quant).slice(begin).join(''), "\n    </select>\n  </div>\n  ").concat(chapterControlTop(manga), "\n  <div id='Chapter' class='").concat(settings.FitWidthIfOversized === true ? 'fitWidthIfOversized' : '', " ").concat(settings.viewMode, "'>\n    ").concat(listPages(manga.quant).slice(begin).join(''), "\n  </div>\n  ").concat(title(manga), "\n  ").concat(chapterControlBottom(manga), "\n  ").concat(panel, "\n  ").concat(controls, "\n  ").concat(htmlKeybinds, "\n  <div id='Navigation' class='panel ").concat(settings.ShowThumbnails ? '' : 'disabled', "'>\n    <div id='NavigationCounters' class='controlLabel'>\n      <img alt='Thumbnails' title='Thumbnails' src='").concat(icon.menu, "' class='nav' /><i>0</i> of <b>").concat(manga.quant, "</b> Pages Loaded\n    </div>\n    <div id='Thumbnails'>\n      ").concat(listThumbnails(manga.quant).slice(begin).join(''), "\n    </div>\n  </div>\n  <a href='#' id='blob' style='display: none;'>Download</a>\n</div>");
   const readerCSS = "<style type='text/css'>\n".concat(cssStyles, "\n#MangaOnlineViewer .PageFunctions .Bookmark {background: url('").concat(icon.bookmark, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .Reload {background: url('").concat(icon.reload, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .Hide {background: url('").concat(icon.hide, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .ZoomIn {background: url('").concat(icon.zoomIn, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .ZoomOut {background: url('").concat(icon.zoomOut, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .ZoomRestore {background: url('").concat(icon.zoomRestore, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .ZoomWidth {background: url('").concat(icon.zoomWidth, "') no-repeat scroll center center transparent;}\n#MangaOnlineViewer .PageFunctions .ZoomHeight {background: url('").concat(icon.zoomWidth, "') no-repeat scroll center center transparent;}\n</style>");
 
